@@ -21,6 +21,14 @@
 namespace cobalt::io
 {
 
+namespace detail
+{
+
+template<int Target>
+struct process_io_binding_;
+
+}
+
 COBALT_IO_DECL
 result<std::pair<struct readable_pipe, struct  writable_pipe>> pipe(
     const cobalt::executor & executor
@@ -57,6 +65,9 @@ struct readable_pipe
 
   friend result<std::pair<struct readable_pipe, struct writable_pipe>> pipe(const cobalt::executor & executor);
   net::basic_readable_pipe<executor> implementation_;
+
+  template<int Target>
+  friend struct detail::process_io_binding_;
 };
 
 
@@ -90,6 +101,9 @@ struct writable_pipe
 
   friend result<std::pair<struct readable_pipe, struct  writable_pipe>> pipe(const cobalt::executor & executor);
   net::basic_writable_pipe<executor> implementation_;
+
+  template<int Target>
+  friend struct detail::process_io_binding_;
 };
 
 

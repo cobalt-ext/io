@@ -17,7 +17,11 @@ process::process(boost::process::v2::filesystem::path executable,
     : process_(exec,
                executable,
                args,
-               initializer.stdio,
+               boost::process::v2::process_stdio{
+                   .in =std::move(initializer.stdio.in),
+                   .out=std::move(initializer.stdio.out),
+                   .err=std::move(initializer.stdio.err),
+               },
                initializer.start_dir,
                initializer.env) {}
 
@@ -29,7 +33,11 @@ process::process(boost::process::v2::filesystem::path executable,
     : process_(exec,
                executable,
                args,
-               initializer.stdio,
+               boost::process::v2::process_stdio{
+                   .in =std::move(initializer.stdio.in),
+                   .out=std::move(initializer.stdio.out),
+                   .err=std::move(initializer.stdio.err),
+               },
                initializer.start_dir,
                initializer.env) {}
 

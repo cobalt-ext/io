@@ -11,6 +11,7 @@
 
 #include <cobalt/io/config.hpp>
 #include <cobalt/io/ops.hpp>
+#include <cobalt/io/pipe.hpp>
 
 #include <boost/process/v2/process.hpp>
 #include <boost/process/v2/stdio.hpp>
@@ -24,11 +25,32 @@
 namespace cobalt::io
 {
 
+namespace detail
+{
+
+template<int Target>
+struct process_io_binding_ : boost::process::v2::detail::process_io_binding<Target>
+{
+  using boost::process::v2::detail::process_io_binding<Target>::process_io_binding;
+
+  process_io_binding_(readable_pipe & rp) : boost::process::v2::detail::process_io_binding<Target>(rp.implementation_) {}
+  process_io_binding_(writable_pipe & wp) : boost::process::v2::detail::process_io_binding<Target>(wp.implementation_) {}
+};
+
+}
+
 using boost::process::v2::pid_type;
 
 struct process_initializer
 {
-  boost::process::v2::process_stdio       stdio;
+  struct stdio_
+  {
+    detail::process_io_binding_<STDIN_FILENO>  in;
+    detail::process_io_binding_<STDOUT_FILENO> out;
+    detail::process_io_binding_<STDERR_FILENO> err;
+
+  };
+  stdio_                                  stdio;
   boost::process::v2::process_start_dir   start_dir{boost::process::v2::filesystem::current_path()};
   boost::process::v2::process_environment env{boost::process::v2::environment::current()};
 };
