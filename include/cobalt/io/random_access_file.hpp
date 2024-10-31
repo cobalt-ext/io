@@ -9,7 +9,6 @@
 #define BOOST_COBALT_EXPERIMENTAL_IO_RANDOM_ACCESS_FILE_HPP
 
 #include <boost/asio/basic_random_access_file.hpp>
-#if defined(BOOST_ASIO_HAS_FILE)
 
 #include <cobalt/io/config.hpp>
 #include <cobalt/io/buffer.hpp>
@@ -24,12 +23,12 @@ namespace cobalt::io
 
 struct random_access_file : file
 {
-  using native_handle_type = net::basic_random_access_file<executor>::native_handle_type;
+  using native_handle_type = file::native_handle_type;
 
   COBALT_IO_DECL random_access_file(const cobalt::executor & executor = this_thread::get_executor());
-  COBALT_IO_DECL random_access_file(const char * path, file_base::flags open_flags,
+  COBALT_IO_DECL random_access_file(const char * path, file::flags open_flags,
                                        const cobalt::executor & executor = this_thread::get_executor());
-  COBALT_IO_DECL random_access_file(const std::string & path, file_base::flags open_flags,
+  COBALT_IO_DECL random_access_file(const std::string & path, file::flags open_flags,
                                        const cobalt::executor & executor = this_thread::get_executor());
   COBALT_IO_DECL random_access_file(const native_handle_type & native_file,
                                        const cobalt::executor & executor = this_thread::get_executor());
@@ -49,12 +48,12 @@ struct random_access_file : file
  private:
   COBALT_IO_DECL static void initiate_read_some_at_(void *, std::uint64_t,  mutable_buffer_sequence, boost::cobalt::completion_handler<error_code, std::size_t>);
   COBALT_IO_DECL static void initiate_write_some_at_(void *, std::uint64_t, const_buffer_sequence,   boost::cobalt::completion_handler<error_code, std::size_t>);
-
+#if defined(BOOST_ASIO_HAS_FILE)
   net::basic_random_access_file<executor> implementation_;
+#endif
 };
 
 
 }
 
-#endif
 #endif //BOOST_COBALT_EXPERIMENTAL_IO_RANDOM_ACCESS_FILE_HPP
