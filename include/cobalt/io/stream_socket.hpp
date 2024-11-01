@@ -19,7 +19,6 @@ namespace cobalt::io
 
 struct [[nodiscard]] stream_socket final : socket
 {
-
   COBALT_IO_DECL stream_socket(const cobalt::executor & executor = this_thread::get_executor());
   COBALT_IO_DECL stream_socket(stream_socket && lhs);
   COBALT_IO_DECL stream_socket(native_handle_type h, protocol_type protocol = protocol_type(),

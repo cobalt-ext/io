@@ -86,7 +86,7 @@ std::size_t tag_invoke(make_endpoint_tag<AF_INET>,
   boost::static_string<16> addr{address.begin(), address.end()};
 
 
-  auto a = net::ip::address_v4::from_string(addr.c_str()).to_uint();
+  auto a = net::ip::make_address_v4(addr.c_str()).to_uint();
   auto in4 = new (base) net::detail::sockaddr_in4_type{
       .sin_family=AF_INET,
       .sin_port=port,
@@ -136,7 +136,7 @@ std::size_t tag_invoke(make_endpoint_tag<AF_INET6>,
 
   boost::static_string<46> addr{address.begin(), address.end()};
 
-  auto a = net::ip::address_v6::from_string(addr.c_str()).to_bytes();
+  auto a = net::ip::make_address_v6(addr.c_str()).to_bytes();
   auto in6 = new (base) net::detail::sockaddr_in6_type{
       .sin6_family=AF_INET6,
       .sin6_port=port
@@ -193,7 +193,7 @@ std::size_t tag_invoke(make_endpoint_tag<AF_UNSPEC>,
 
   boost::static_string<46> addr{address.begin(), address.end()};
 
-  auto ad = net::ip::address::from_string(addr.c_str());
+  auto ad = net::ip::make_address(addr.c_str());
   if (ad.is_v4())
   {
     new (base) net::detail::sockaddr_in4_type{

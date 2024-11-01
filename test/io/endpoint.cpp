@@ -6,7 +6,7 @@
 //
 
 #include <cobalt/io/endpoint.hpp>
-#include "test.hpp"
+#include "../test.hpp"
 
 
 BOOST_AUTO_TEST_SUITE(endpoint_);

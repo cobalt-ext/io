@@ -4,7 +4,7 @@ project(cobalt.io)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(Boost REQUIRED cobalt)
+find_package(Boost REQUIRED cobalt process filesystem)
 
 add_library(cobalt_io
             src/acceptor.cpp
@@ -26,12 +26,13 @@ add_library(cobalt_io
             src/stream_file.cpp
             src/stream_socket.cpp
             src/system_timer.cpp
-            src/write.cpp)
+            src/write.cpp
+            src/stdio.cpp)
 
-target_link_libraries(cobalt_io PUBLIC Boost::cobalt)
+target_link_libraries(cobalt_io PUBLIC Boost::cobalt Boost::process Boost::filesystem)
 target_include_directories(cobalt_io PUBLIC ./include)
 target_compile_features(cobalt_io PUBLIC cxx_std_20)
-target_include_directories(cobalt_io PRIVATE COBALT_IO_SOURCE=1)
+target_compile_definitions(cobalt_io PRIVATE COBALT_IO_SOURCE=1 BOOST_PROCESS_USE_STD_FS=1)
 add_library(cobalt::io ALIAS cobalt_io)
 
 if (BUILD_TESTING)
