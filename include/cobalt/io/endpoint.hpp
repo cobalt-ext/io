@@ -12,9 +12,10 @@
 #include <boost/cobalt/detail/exception.hpp>
 
 #include <boost/asio/detail/socket_types.hpp>
-#include <boost/url/static_url.hpp>
+#include <boost/endian/conversion.hpp>
 #include <boost/static_string.hpp>
 #include <boost/system/result.hpp>
+#include <boost/url/static_url.hpp>
 
 #include <span>
 
@@ -238,7 +239,7 @@ const local_endpoint* tag_invoke(get_endpoint_tag<AF_UNIX>,
 
 struct ip_address_v4
 {
-    std::uint16_t port() const {return in_.sin_port;}
+    std::uint16_t port() const {return boost::endian::big_to_native(in_.sin_port);}
     std::uint32_t addr() const {return in_.sin_addr.s_addr;}
     COBALT_IO_DECL boost::static_string<15> addr_str() const;
  private:
@@ -268,7 +269,7 @@ const ip_address_v4* tag_invoke(get_endpoint_tag<AF_INET>,
 
 struct ip_address_v6
 {
-  std::uint16_t port() const {return in_.sin6_port;}
+  std::uint16_t port() const {return boost::endian::big_to_native(in_.sin6_port);}
   std::array<std::uint8_t, 16u> addr() const
   {
     std::array<std::uint8_t, 16u> res;
@@ -308,7 +309,7 @@ struct ip_address
   bool is_ipv6() const { return addr_.ss_family == BOOST_ASIO_OS_DEF(AF_INET6); }
   bool is_ipv4() const { return addr_.ss_family == BOOST_ASIO_OS_DEF(AF_INET); }
 
-  std::uint16_t port() const {return addr_.ss_family == AF_INET ? in_.sin_port : in6_.sin6_port;}
+  std::uint16_t port() const {return boost::endian::big_to_native(addr_.ss_family == AF_INET ? in_.sin_port : in6_.sin6_port);}
 
   COBALT_IO_DECL std::array<std::uint8_t, 16u> addr() const;
   COBALT_IO_DECL boost::static_string<45> addr_str() const;
