@@ -105,7 +105,7 @@ struct socket
     struct endpoint endpoint;
 
     void *this_;
-    void (*implementation)(void * this_, wait_type wt,
+    void (*implementation)(void * this_, struct endpoint,
                            boost::cobalt::completion_handler<error_code>);
 
     op_awaitable<connect_op, std::tuple<struct endpoint>, error_code>
@@ -116,7 +116,7 @@ struct socket
   };
   connect_op connect(endpoint ep)
   {
-    return {ep, this, initiate_wait_};
+    return {ep, this, initiate_connect_};
   }
 
   socket(net::basic_socket<protocol_type, executor> & socket) : socket_(socket) {}
