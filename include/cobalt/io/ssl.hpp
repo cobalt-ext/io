@@ -49,7 +49,7 @@ struct ssl_stream_base
     return {buffer, this, initiate_read_some_};
   }
 
-   struct handshake_op
+   struct [[nodiscard]] handshake_op
    {
      handshake_type ht;
 
@@ -64,7 +64,7 @@ struct ssl_stream_base
      }
    };
 
-   struct buffered_handshake_op
+   struct [[nodiscard]] buffered_handshake_op
    {
      handshake_type ht;
      const_buffer_sequence buffer;

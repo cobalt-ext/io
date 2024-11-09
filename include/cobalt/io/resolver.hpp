@@ -30,7 +30,7 @@ struct resolver
 
  private:
 
-  struct resolve_op_ final : op<error_code, pmr::vector<endpoint>>
+  struct [[nodiscard]] resolve_op_ final : op<error_code, pmr::vector<endpoint>>
   {
     COBALT_IO_DECL
     void initiate(completion_handler<error_code, pmr::vector<endpoint>> h) override;

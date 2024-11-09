@@ -81,7 +81,7 @@ struct socket
   [[nodiscard]] COBALT_IO_DECL result<void> set_reuse_address(bool reuse_address);
   [[nodiscard]] COBALT_IO_DECL result<bool> get_reuse_address() const;
 
-  struct wait_op
+  struct [[nodiscard]] wait_op
   {
     wait_type wt;
 
@@ -100,7 +100,7 @@ struct socket
     return {wt, this, initiate_wait_};
   }
 
-  struct connect_op
+  struct [[nodiscard]] connect_op
   {
     struct endpoint endpoint;
 

@@ -17,7 +17,7 @@
 namespace cobalt::detail::io
 {
 
-struct steady_sleep
+struct [[nodiscard]] steady_sleep
 {
   steady_sleep(const std::chrono::steady_clock::time_point & tp) : tim{tp} {}
   steady_sleep(const std::chrono::steady_clock::duration & du)   : tim{du} {}
@@ -28,7 +28,7 @@ struct steady_sleep
   std::optional<decltype(tim.wait())> op_;
 };
 
-struct system_sleep
+struct [[nodiscard]] system_sleep
 {
   system_sleep(const std::chrono::system_clock::time_point & tp) : tim{tp} {}
   system_sleep(const std::chrono::system_clock::duration & du)   : tim{du} {}

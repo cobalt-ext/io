@@ -87,7 +87,7 @@ struct process
 
   [[nodiscard]] pid_type id() const;
 
-  struct wait_op
+  struct [[nodiscard]] wait_op
   {
     void *this_;
     void (*implementation)(void * this_,

@@ -123,7 +123,7 @@ struct op_awaitable : op_awaitable_base<Op, Args, Ts...>
   }
 };
 
-struct write_op
+struct [[nodiscard]] write_op
 {
   const_buffer_sequence buffer;
 
@@ -138,7 +138,7 @@ struct write_op
   }
 };
 
-struct read_op
+struct [[nodiscard]] read_op
 {
   mutable_buffer_sequence buffer;
 
@@ -153,7 +153,7 @@ struct read_op
   }
 };
 
-struct write_at_op
+struct [[nodiscard]] write_at_op
 {
   std::uint64_t offset;
   const_buffer_sequence buffer;
@@ -169,7 +169,7 @@ struct write_at_op
   }
 };
 
-struct read_at_op
+struct [[nodiscard]] read_at_op
 {
   std::uint64_t offset;
   mutable_buffer_sequence buffer;
@@ -185,7 +185,7 @@ struct read_at_op
   }
 };
 
-struct wait_op
+struct [[nodiscard]] wait_op
 {
   void *this_;
   void (*implementation)(void * this_,

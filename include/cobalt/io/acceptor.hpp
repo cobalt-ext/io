@@ -25,7 +25,7 @@ struct acceptor : net::socket_base
   COBALT_IO_DECL result<void> listen(int backlog = max_listen_connections); // int backlog = net::max_backlog()
   COBALT_IO_DECL endpoint local_endpoint();
 
-  struct accept_op
+  struct [[nodiscard]]  accept_op
   {
     socket * sock;
 
@@ -45,7 +45,7 @@ struct acceptor : net::socket_base
     return {&sock, this, initiate_accept_};
   }
 
-  struct wait_op
+  struct [[nodiscard]] wait_op
   {
     wait_type wt;
 

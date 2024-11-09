@@ -29,7 +29,7 @@ template<typename Stream>
   {
     {str.write_some(buffer)} -> std::same_as<write_op>;
   }
-  write_all write(Stream & str, const_buffer_sequence buffer)
+write_all write(Stream & str, const_buffer_sequence buffer)
 {
   return write_all{str.write_some(buffer)};
 }

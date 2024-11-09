@@ -31,7 +31,7 @@ struct signal_set
 
 
  private:
-  struct wait_op_ final : cobalt::op<error_code, int>
+  struct [[nodiscard]] wait_op_ final : cobalt::op<error_code, int>
   {
     COBALT_IO_DECL
     void initiate(completion_handler<error_code, int> h) final;

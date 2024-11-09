@@ -30,7 +30,7 @@ struct [[nodiscard]] seq_packet_socket final : socket
                   const cobalt::executor & executor = this_thread::get_executor());
 
 
-  struct send_op
+  struct [[nodiscard]] send_op
   {
     message_flags in_flags;
     const_buffer_sequence buffer;
@@ -46,7 +46,7 @@ struct [[nodiscard]] seq_packet_socket final : socket
     }
   };
 
-  struct receive_op
+  struct [[nodiscard]] receive_op
   {
     message_flags in_flags, *out_flags;
     mutable_buffer_sequence buffer;
