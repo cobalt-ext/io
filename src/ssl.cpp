@@ -60,31 +60,67 @@ void ssl_stream::adopt_endpoint_(endpoint & ep)
 
 void ssl_stream::initiate_read_some_(void *this_ , mutable_buffer_sequence buffer, boost::cobalt::completion_handler<error_code, std::size_t> handler)
 {
-  initiate_async_read_some(static_cast<ssl_stream*>(this_)->ssl_stream_, buffer, std::move(handler));
+  auto th = static_cast<ssl_stream*>(this_);
+  if (th->mode_ == 3)
+    initiate_async_read_some(th->ssl_stream_.next_layer(), buffer, std::move(handler));
+  else
+    initiate_async_read_some(th->ssl_stream_,              buffer, std::move(handler));
 
 }
+
 void ssl_stream::initiate_write_some_   (void * this_, const_buffer_sequence buffer, boost::cobalt::completion_handler<error_code, std::size_t> handler)
 {
-  initiate_async_write_some(static_cast<ssl_stream*>(this_)->ssl_stream_, buffer, std::move(handler));
-
+  auto th = static_cast<ssl_stream*>(this_);
+  if (th->mode_ == 3)
+    initiate_async_write_some(th->ssl_stream_.next_layer(), buffer, std::move(handler));
+  else
+    initiate_async_write_some(th->ssl_stream_,              buffer, std::move(handler));
 }
+
 void ssl_stream::initiate_shutdown_(void * this_, boost::cobalt::completion_handler<error_code> handler)
 {
-  static_cast<ssl_stream*>(this_)->ssl_stream_.async_shutdown(std::move(handler));
+  auto t = static_cast<ssl_stream*>(this_);
+  t->ssl_stream_.async_shutdown(
+      boost::asio::deferred(
+          [t](error_code ec)
+          {
+            if (!ec)
+              t->mode_ &= ~1;
+            return boost::asio::deferred.values(ec);
+          }))(std::move(handler));
 }
+
 void ssl_stream::initiate_handshake_(void *this_, handshake_type ht, boost::cobalt::completion_handler<error_code> handler)
 {
-  static_cast<ssl_stream*>(this_)->ssl_stream_.async_handshake(ht, std::move(handler));
+  auto t = static_cast<ssl_stream*>(this_);
+  t->ssl_stream_.async_handshake(
+      ht, boost::asio::deferred(
+          [t](error_code ec)
+          {
+            if (!ec)
+              t->mode_ |= 1;
+            return boost::asio::deferred.values(ec);
+          }))(std::move(handler));
 }
 
 void ssl_stream::initiate_buffered_handshake_(void * this_, handshake_type ht, const_buffer_sequence seq,
                                               boost::cobalt::completion_handler<error_code, std::size_t> handler)
 {
-  auto & str = static_cast<ssl_stream*>(this_)->ssl_stream_;
+  auto t = static_cast<ssl_stream*>(this_);
+  auto & str = t->ssl_stream_;
+
+  auto d = boost::asio::deferred(
+              [t](error_code ec, std::size_t n)
+              {
+                if (!ec)
+                  t->mode_ |= 1;
+                return boost::asio::deferred.values(ec, n);
+              });
+
   if (seq.buffer_count() > 0u)
-    str.async_handshake(ht, seq, std::move(handler));
+    str.async_handshake(ht, seq, d)(std::move(handler));
   else
-    str.async_handshake(ht, seq.head, std::move(handler));
+    str.async_handshake(ht, seq.head, d)(std::move(handler));
 }
 
 

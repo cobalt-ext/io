@@ -49,54 +49,58 @@ struct ssl_stream_base
     return {buffer, this, initiate_read_some_};
   }
 
-   struct [[nodiscard]] handshake_op
-   {
-     handshake_type ht;
+  struct [[nodiscard]] handshake_op
+  {
+    handshake_type ht;
 
-     void *this_;
-     void (*implementation)(void * this_, handshake_type,
-                            boost::cobalt::completion_handler<error_code>);
+    void *this_;
+    void (*implementation)(void * this_, handshake_type,
+                           boost::cobalt::completion_handler<error_code>);
 
-     op_awaitable<handshake_op, std::tuple<handshake_type>, error_code>
-         operator co_await()
-     {
-       return {this, ht};
-     }
-   };
+    op_awaitable<handshake_op, std::tuple<handshake_type>, error_code>
+        operator co_await()
+    {
+      return {this, ht};
+    }
+  };
 
-   struct [[nodiscard]] buffered_handshake_op
-   {
-     handshake_type ht;
-     const_buffer_sequence buffer;
+  struct [[nodiscard]] buffered_handshake_op
+  {
+    handshake_type ht;
+    const_buffer_sequence buffer;
+    void *this_;
+    void (*implementation)(void * this_, handshake_type, const_buffer_sequence,
+                           boost::cobalt::completion_handler<error_code, std::size_t>);
+    op_awaitable<buffered_handshake_op, std::tuple<handshake_type, const_buffer_sequence>, error_code, std::size_t>
+        operator co_await()
+    {
+      return {this, ht, buffer};
+    }
+  };
 
-     void *this_;
-     void (*implementation)(void * this_, handshake_type, const_buffer_sequence,
-                            boost::cobalt::completion_handler<error_code, std::size_t>);
+  handshake_op handshake(handshake_type ht)
+  {
+    return {ht, this,  initiate_handshake_};
+  }
 
-     op_awaitable<buffered_handshake_op, std::tuple<handshake_type, const_buffer_sequence>, error_code, std::size_t>
-         operator co_await()
-     {
-       return {this, ht, buffer};
-     }
-   };
+  buffered_handshake_op handshake(handshake_type ht, const_buffer_sequence buffer)
+  {
+    return {ht, buffer, this, initiate_buffered_handshake_};
+  }
 
-   handshake_op handshake(handshake_type ht)
-   {
-     return {ht, this,  initiate_handshake_};
-   }
+  io::wait_op shutdown()
+  {
+    return {this, initiate_shutdown_};
+  }
 
-   buffered_handshake_op handshake(handshake_type ht, const_buffer_sequence buffer)
-   {
-     return {ht, buffer, this, initiate_buffered_handshake_};
-   }
-
-   io::wait_op shutdown()
-   {
-     return {this, initiate_shutdown_};
-   }
-
-
+  bool upgraded()    const {return (mode_ & 1) != 0;}
+  bool hybrid_mode() const {return (mode_ & 3) != 0;}
+  void  enable_hybrid_mode() {mode_ |=  3;}
+  void disable_hybrid_mode() {mode_ &= ~3;}
  private:
+  int mode_ = 0;
+
+
   COBALT_IO_DECL static void initiate_read_some_ (void *, mutable_buffer_sequence, boost::cobalt::completion_handler<error_code, std::size_t>);
   COBALT_IO_DECL static void initiate_write_some_(void *, const_buffer_sequence, boost::cobalt::completion_handler<error_code, std::size_t>);
   COBALT_IO_DECL static void initiate_shutdown_(void *, boost::cobalt::completion_handler<error_code>);
