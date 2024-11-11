@@ -26,7 +26,8 @@ add_library(cobalt_io
             src/stream_file.cpp
             src/stream_socket.cpp
             src/system_timer.cpp
-            src/write.cpp)
+            src/write.cpp
+            src/mysql.cpp)
 
 target_link_libraries(cobalt_io PUBLIC Boost::cobalt)
 target_include_directories(cobalt_io PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
