@@ -81,6 +81,9 @@ struct socket
   [[nodiscard]] COBALT_IO_DECL result<void> set_reuse_address(bool reuse_address);
   [[nodiscard]] COBALT_IO_DECL result<bool> get_reuse_address() const;
 
+  [[nodiscard]] COBALT_IO_DECL result<void> set_no_delay(bool reuse_address);
+  [[nodiscard]] COBALT_IO_DECL result<bool> get_no_delay() const;
+
   struct [[nodiscard]] wait_op
   {
     wait_type wt;

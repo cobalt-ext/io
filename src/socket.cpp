@@ -8,6 +8,7 @@
 #include <cobalt/io/socket.hpp>
 #include <boost/asio/local/connect_pair.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 namespace cobalt::io
 {
@@ -113,6 +114,26 @@ DEFINE_OPTION(send_buffer_size,      std::size_t);
 DEFINE_OPTION(receive_low_watermark, std::size_t);
 DEFINE_OPTION(send_low_watermark,    std::size_t);
 DEFINE_OPTION(reuse_address, bool);
+
+#define DEFINE_TCP_OPTION(Name, Type)                                          \
+result<void> socket::set_##Name(Type value)                                    \
+{                                                                              \
+  error_code ec;                                                               \
+  socket_.set_option(net::ip::tcp::Name(value), ec);                           \
+  return ec ? ec : result<void>{};                                             \
+}                                                                              \
+                                                                               \
+result<Type> socket::get_##Name() const                                        \
+{                                                                              \
+  error_code ec;                                                               \
+  net::ip::tcp::Name opt;                                                      \
+  socket_.get_option(opt, ec);                                                 \
+  return ec                                                                    \
+       ? result<Type>(boost::system::in_place_error, ec)                       \
+       : result<Type>(boost::system::in_place_value, opt.value());             \
+}
+
+DEFINE_TCP_OPTION(no_delay, bool);
 
 result<void> socket::set_linger(bool linger, int timeout)
 {
