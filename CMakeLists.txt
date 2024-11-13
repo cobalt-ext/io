@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.28)
 
 project(cobalt.io)
 
@@ -17,6 +17,7 @@ add_library(cobalt_io
             src/random_access_file.cpp
             src/read.cpp
             src/resolver.cpp
+            src/sendfile.cpp
             src/seq_packet_socket.cpp
             src/serial_port.cpp
             src/signal_set.cpp
