@@ -122,6 +122,28 @@ struct socket
     return {ep, this, initiate_connect_};
   }
 
+
+  struct [[nodiscard]] ranged_connect_op
+  {
+    endpoint_sequence endpoints;
+
+    void *this_;
+    void (*implementation)(void * this_, endpoint_sequence,
+                           boost::cobalt::completion_handler<error_code, endpoint>);
+
+    op_awaitable<ranged_connect_op, std::tuple<endpoint_sequence>, error_code, endpoint>
+        operator co_await()
+    {
+      return {this, std::move(endpoints)};
+    }
+  };
+  ranged_connect_op connect(endpoint_sequence ep)
+  {
+    return {std::move(ep), this, initiate_ranged_connect_};
+  }
+
+
+
   socket(net::basic_socket<protocol_type, executor> & socket) : socket_(socket) {}
 
  private:
@@ -131,6 +153,8 @@ struct socket
   net::basic_socket<protocol_type, executor> & socket_;
   COBALT_IO_DECL static void initiate_wait_(void *, wait_type, completion_handler<error_code>);
   COBALT_IO_DECL static void initiate_connect_(void *, endpoint, completion_handler<error_code>);
+  COBALT_IO_DECL static void initiate_ranged_connect_(void *, endpoint_sequence,
+                                                      completion_handler<error_code, endpoint>);
 };
 
 COBALT_IO_DECL result<void> connect_pair(protocol_type protocol, socket & socket1, socket & socket2);

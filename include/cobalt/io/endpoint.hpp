@@ -17,6 +17,12 @@
 #include <boost/system/result.hpp>
 #include <boost/url/static_url.hpp>
 
+#if defined(BOOST_COBALT_NO_PMR)
+#include <boost/container/pmr/vector.hpp>
+#else
+#include <vector>
+#endif
+
 #include <span>
 
 namespace cobalt::detail
@@ -190,6 +196,12 @@ struct endpoint
 
 #if __GNUC__ && !defined(__clang__)
 #pragma GCC diagnostic pop
+#endif
+
+#if defined(BOOST_COBALT_NO_PMR)
+using endpoint_sequence = std::vector<endpoint>;
+#else
+using endpoint_sequence = pmr::vector<endpoint>;
 #endif
 
 

@@ -9,6 +9,7 @@
 #include <boost/asio/local/connect_pair.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/connect.hpp>
 
 namespace cobalt::io
 {
@@ -193,6 +194,15 @@ void socket::initiate_connect_(void * this_, endpoint ep, completion_handler<err
   auto sock = static_cast<socket*>(this_);
   sock->adopt_endpoint_(ep);
   sock->socket_.async_connect(ep, std::move(handler));
+}
+
+void socket::initiate_ranged_connect_(void * this_, endpoint_sequence eps, completion_handler<error_code, endpoint> handler)
+{
+  auto sock = static_cast<socket*>(this_);
+  for (auto & ep : eps)
+    sock->adopt_endpoint_(ep);
+  boost::asio::async_connect(
+      sock->socket_, eps, std::move(handler));
 }
 
 }

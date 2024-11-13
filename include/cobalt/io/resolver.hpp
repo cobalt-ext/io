@@ -14,7 +14,8 @@
 #include <boost/cobalt/promise.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/container/pmr/vector.hpp>
+
+
 #include <boost/system/result.hpp>
 #include <boost/url/url_view.hpp>
 
@@ -29,11 +30,10 @@ struct resolver
   void cancel();
 
  private:
-
-  struct [[nodiscard]] resolve_op_ final : op<error_code, pmr::vector<endpoint>>
+  struct [[nodiscard]] resolve_op_ final : op<error_code, endpoint_sequence>
   {
     COBALT_IO_DECL
-    void initiate(completion_handler<error_code, pmr::vector<endpoint>> h) override;
+    void initiate(completion_handler<error_code, endpoint_sequence> h) override;
 
     resolve_op_(net::ip::basic_resolver<protocol_type, executor> & resolver,
                 std::string_view host, std::string_view service)
