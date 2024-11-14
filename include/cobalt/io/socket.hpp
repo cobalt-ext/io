@@ -91,6 +91,7 @@ struct socket
     void *this_;
     void (*implementation)(void * this_, wait_type wt,
                            boost::cobalt::completion_handler<error_code>);
+    void (*try_implementation)(void * this_, wait_type wt, boost::cobalt::handler<error_code>) = nullptr;
 
     op_awaitable<wait_op, std::tuple<wait_type>, error_code>
         operator co_await()
@@ -100,7 +101,7 @@ struct socket
   };
   wait_op     wait(wait_type wt = wait_type::wait_read)
   {
-    return {wt, this, initiate_wait_};
+    return {wt, this, initiate_wait_, try_wait_};
   }
 
   struct [[nodiscard]] connect_op
@@ -110,6 +111,8 @@ struct socket
     void *this_;
     void (*implementation)(void * this_, struct endpoint,
                            boost::cobalt::completion_handler<error_code>);
+
+    constexpr static void (*try_implementation)(void * this_, struct endpoint, boost::cobalt::handler<error_code>) = nullptr;
 
     op_awaitable<connect_op, std::tuple<struct endpoint>, error_code>
         operator co_await()
@@ -131,6 +134,8 @@ struct socket
     void (*implementation)(void * this_, endpoint_sequence,
                            boost::cobalt::completion_handler<error_code, endpoint>);
 
+    constexpr static void (*try_implementation)(void * this_, endpoint_sequence, boost::cobalt::handler<error_code, endpoint>) = nullptr;
+
     op_awaitable<ranged_connect_op, std::tuple<endpoint_sequence>, error_code, endpoint>
         operator co_await()
     {
@@ -151,6 +156,7 @@ struct socket
 
   friend struct acceptor;
   net::basic_socket<protocol_type, executor> & socket_;
+  COBALT_IO_DECL static void try_wait_(void *, wait_type, handler<error_code>);
   COBALT_IO_DECL static void initiate_wait_(void *, wait_type, completion_handler<error_code>);
   COBALT_IO_DECL static void initiate_connect_(void *, endpoint, completion_handler<error_code>);
   COBALT_IO_DECL static void initiate_ranged_connect_(void *, endpoint_sequence,

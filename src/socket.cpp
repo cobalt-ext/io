@@ -205,4 +205,11 @@ void socket::initiate_ranged_connect_(void * this_, endpoint_sequence eps, compl
       sock->socket_, eps, std::move(handler));
 }
 
+void socket::try_wait_(void *this_, wait_type wt, handler<error_code> h)
+{
+  auto sock = static_cast<socket*>(this_);
+  if ((wt == wait_type::wait_read) && ((sock->bytes_readable() || 0u) > 0u))
+    h({});
+}
+
 }

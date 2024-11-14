@@ -39,7 +39,20 @@ struct op_awaitable_base
   {
   }
 
-  bool await_ready() { return false; }
+  bool await_ready()
+  {
+    if (op_.try_implementation)
+    {
+      std::apply([&]<typename ... Args_>(Args_ && ... args_)
+                 {
+                    (*op_.try_implementation)(op_.this_, std::forward<Args_>(args_)..., handler<Ts...>(result));
+                 }, std::move(args));
+
+      return result.has_value();
+    }
+    else
+      return false;
+  }
 
   detail::completed_immediately_t completed_immediately = detail::completed_immediately_t::no;
   std::exception_ptr init_ep;
@@ -130,6 +143,7 @@ struct [[nodiscard]] write_op
   void *this_;
   void (*implementation)(void * this_, const_buffer_sequence,
                          boost::cobalt::completion_handler<error_code, std::size_t>);
+  void (*try_implementation)(void * this_, const_buffer_sequence, boost::cobalt::handler<error_code, std::size_t>) = nullptr;
 
   op_awaitable<write_op, std::tuple<const_buffer_sequence>, error_code, std::size_t>
   operator co_await()
@@ -145,6 +159,7 @@ struct [[nodiscard]] read_op
   void *this_;
   void (*implementation)(void * this_, mutable_buffer_sequence,
                          boost::cobalt::completion_handler<error_code, std::size_t>);
+  void (*try_implementation)(void * this_, mutable_buffer_sequence, boost::cobalt::handler<error_code, std::size_t>) = nullptr;
 
   op_awaitable<read_op, std::tuple<mutable_buffer_sequence>, error_code, std::size_t>
       operator co_await()
@@ -161,6 +176,7 @@ struct [[nodiscard]] write_at_op
   void *this_;
   void (*implementation)(void * this_, std::uint64_t, const_buffer_sequence,
                          boost::cobalt::completion_handler<error_code, std::size_t>);
+  void (*try_implementation)(void * this_, const_buffer_sequence, boost::cobalt::handler<error_code, std::size_t>) = nullptr;
 
   op_awaitable<write_at_op, std::tuple<std::uint64_t , const_buffer_sequence>, error_code, std::size_t>
       operator co_await()
@@ -177,6 +193,7 @@ struct [[nodiscard]] read_at_op
   void *this_;
   void (*implementation)(void * this_, std::uint64_t, mutable_buffer_sequence,
                          boost::cobalt::completion_handler<error_code, std::size_t>);
+  void (*try_implementation)(void * this_, mutable_buffer_sequence, boost::cobalt::handler<error_code, std::size_t>) = nullptr;
 
   op_awaitable<read_at_op, std::tuple<std::uint64_t , mutable_buffer_sequence>, error_code, std::size_t>
       operator co_await()
@@ -191,6 +208,7 @@ struct [[nodiscard]] wait_op
   void (*implementation)(void * this_,
                          boost::cobalt::completion_handler<error_code>);
 
+  void (*try_implementation)(void * this_, boost::cobalt::handler<error_code>) = nullptr;
   op_awaitable<wait_op, std::tuple<>, error_code>
       operator co_await()
   {

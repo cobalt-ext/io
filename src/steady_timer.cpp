@@ -44,5 +44,13 @@ void steady_timer::initiate_wait_(void * this_, boost::cobalt::completion_handle
   static_cast<steady_timer*>(this_)->timer_.async_wait(std::move(handler));
 }
 
+void steady_timer::try_wait_(void * this_, boost::cobalt::handler<error_code> h)
+{
+  if (static_cast<steady_timer*>(this_)->timer_.expiry()
+    < std::chrono::steady_clock::now())
+    h({});
+}
+
+
 
 }

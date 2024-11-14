@@ -41,10 +41,11 @@ struct steady_timer
   void reset(const duration& expiry_time);
   bool expired() const;
 
-  [[nodiscard]] wait_op wait() { return {this, initiate_wait_}; }
+  [[nodiscard]] wait_op wait() { return {this, initiate_wait_, try_wait_}; }
  private:
 
   COBALT_IO_DECL static void initiate_wait_(void *, boost::cobalt::completion_handler<error_code>);
+  COBALT_IO_DECL static void try_wait_(void *, boost::cobalt::handler<error_code>);
 
   net::basic_waitable_timer<std::chrono::steady_clock,
                                     net::wait_traits<std::chrono::steady_clock>,

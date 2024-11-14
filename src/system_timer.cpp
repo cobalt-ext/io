@@ -44,6 +44,11 @@ void system_timer::initiate_wait_(void * this_, boost::cobalt::completion_handle
   static_cast<system_timer*>(this_)->timer_.async_wait(std::move(handler));
 }
 
-
+void system_timer::try_wait_(void * this_, boost::cobalt::handler<error_code> h)
+{
+  if (static_cast<system_timer*>(this_)->timer_.expiry()
+      < std::chrono::system_clock::now())
+    h({});
+}
 
 }
