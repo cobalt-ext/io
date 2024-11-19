@@ -57,7 +57,6 @@ struct resolver
   net::ip::basic_resolver<protocol_type, executor> resolver_;
 };
 
-// NOTE: Doesn't need to be a promise, can be optimized.
 struct lookup
 {
   lookup(std::string_view host, std::string_view service)
