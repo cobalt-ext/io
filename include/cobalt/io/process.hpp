@@ -92,6 +92,7 @@ struct process
     void *this_;
     void (*implementation)(void * this_,
                            boost::cobalt::completion_handler<error_code, int>);
+    void (*try_implementation)(void * this_, boost::cobalt::handler<error_code, int>);
 
     op_awaitable<wait_op, std::tuple<>, error_code, int>
         operator co_await()
