@@ -25,11 +25,11 @@ struct read_all  final : op<error_code, std::size_t>
 };
 
 template<typename Stream>
-  requires requires (Stream & str, const_buffer_sequence buffer)
+  requires requires (Stream & str, mutable_buffer_sequence buffer)
   {
     {str.read_some(buffer)} -> std::same_as<read_op>;
   }
-  read_all read(Stream & str, const_buffer_sequence buffer)
+  read_all read(Stream & str, mutable_buffer_sequence buffer)
 {
   return read_all{str.read_some(buffer)};
 }

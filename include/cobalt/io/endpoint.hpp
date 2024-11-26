@@ -225,7 +225,7 @@ auto get(const endpoint & ep, const boost::source_location & loc = BOOST_CURRENT
 {
   auto e = get_if<Protocol>(&ep);
   if (!e)
-    detail::throw_bad_endpoint_access(loc);
+    cobalt::detail::throw_bad_endpoint_access(loc);
   return *e;
 }
 

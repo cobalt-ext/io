@@ -121,7 +121,7 @@ auto file::native_handle() -> native_handle_type {return file_.native_handle();}
 
 result<void> file::open(const char * path, flags open_flags)
 {
-  int r = ::open(path, 0777, static_cast<int>(open_flags));
+  int r = ::open(path, static_cast<int>(open_flags), 0777);
   if (r == -1)
     COBALT_RETURN_ERROR();
   boost::system::error_code ec;
