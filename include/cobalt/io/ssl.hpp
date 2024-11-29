@@ -33,6 +33,9 @@ struct ssl_stream_base
 {
   using shutdown_result = result<void>;
 
+  using native_handle_type = typename net::ssl::stream<net::basic_stream_socket<io::protocol_type, executor>>::native_handle_type;
+  native_handle_type native_handle() { return ssl_stream_.native_handle(); }
+
   COBALT_IO_DECL ssl_stream(const executor & executor = this_thread::get_executor());
   COBALT_IO_DECL ssl_stream(ssl_stream && steam);
   COBALT_IO_DECL ssl_stream(stream_socket && socket);
